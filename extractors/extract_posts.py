@@ -92,7 +92,6 @@ class PostExtractor:
                         )
                         if submission.created_utc
                         else None,
-                        moderator.generate_embeddings(text=submission.selftext) if submission.selftext else None
                     )
                 )
             except Exception as e:

@@ -16,7 +16,6 @@ class SchemaConfigs:
             "score",
             "num_comments",
             "created_utc",
-            "embeddings"
         ],
         "comments":[
             "id",
@@ -26,5 +25,14 @@ class SchemaConfigs:
             "author",
             "score",
             "created_utc"
+        ],
+        "posts_embeddings":[
+            "id",
+            "title",
+            "author",
+            "flair",
+            "selftext",
+            "created_utc",
+            "embeddings"
         ]
     }   

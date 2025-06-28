@@ -9,6 +9,17 @@ CREATE TABLE IF NOT EXISTS POSTS(
     SCORE BIGINT, 
     NUM_COMMENTS BIGINT,
     CREATED_UTC TIMESTAMPTZ,
+    PROCESSING_TIMESTAMP TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS POSTS_EMBEDDINGS(
+    ID TEXT PRIMARY KEY,
+    FOREIGN KEY (ID) REFERENCES POSTS(ID) ON DELETE CASCADE,
+    TITLE TEXT,
+    AUTHOR TEXT,
+    FLAIR TEXT,
+    SELFTEXT TEXT,
+    CREATED_UTC TIMESTAMPTZ,
     EMBEDDINGS vector(1536),
     PROCESSING_TIMESTAMP TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -31,7 +42,7 @@ CREATE TABLE IF NOT EXISTS COMMENTS(
 -- if you don't specify WITH (lists = ...), PostgreSQL uses a very small default
 -- (maybe just 1), which hurts performance and accuracy.
 CREATE INDEX posts_embedding_idx
-ON posts
+ON posts_embeddings
 USING ivfflat (embeddings vector_cosine_ops)
 WITH (lists = 100);  -- Tune this depending on dataset size
 
