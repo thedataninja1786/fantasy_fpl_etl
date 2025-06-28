@@ -75,6 +75,8 @@ class PostExtractor:
 
         for submission in subreddit.new(limit=self.post_limit):
             try:
+                if not submission.score or submission.score < 4:
+                    continue 
                 post_data.append(
                     (
                         submission.id,
@@ -83,7 +85,7 @@ class PostExtractor:
                         submission.link_flair_text or "",
                         submission.selftext or "",
                         str(submission.subreddit),
-                        submission.score or 0,
+                        submission.score,
                         submission.num_comments or 0,
                         datetime.utcfromtimestamp(submission.created_utc).strftime(
                             "%Y-%m-%d_%H:%M:%S"
