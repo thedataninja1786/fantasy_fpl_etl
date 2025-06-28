@@ -28,5 +28,12 @@ CREATE TABLE IF NOT EXISTS COMMENTS(
 );
 
 -- Create index on posts for fast search
-CREATE INDEX ON POSTS
-USING ivfflat (EMBEDDINGS vector_cosine_ops);
+-- if you don't specify WITH (lists = ...), PostgreSQL uses a very small default
+-- (maybe just 1), which hurts performance and accuracy.
+CREATE INDEX posts_embedding_idx
+ON posts
+USING ivfflat (embeddings vector_cosine_ops)
+WITH (lists = 100);  -- Tune this depending on dataset size
+
+-- controls the accuracy vs. speed tradeoff. More probes = better results, slower search
+SET ivfflat.probes = 10;
