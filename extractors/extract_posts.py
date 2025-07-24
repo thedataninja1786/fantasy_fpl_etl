@@ -2,7 +2,6 @@ import praw
 from typing import List, Dict, Tuple, Any
 from datetime import datetime
 from praw.models import Subreddit
-from ai_moderator.chatbot import AIModerator
 
 class PostExtractor:
     def __init__(
@@ -42,7 +41,7 @@ class PostExtractor:
             f"post_limit={self.post_limit})"
         )
 
-    def fetch_post_data(self,moderator:AIModerator) -> List[Tuple[Any]]:
+    def fetch_post_data(self) -> List[Tuple[Any]]:
         """
         Fetches post data from the specified subreddit.
         Iterates through the newest posts up to the given limit,

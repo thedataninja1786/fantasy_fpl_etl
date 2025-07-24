@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from extractors.extract_posts import PostExtractor
 from dataloader.load_data import DataLoader
 from openai import OpenAI
-from ai_moderator.chatbot import AIModerator
 
 load_dotenv()
 
@@ -27,7 +26,6 @@ POST_LIMIT = PostAPIConfigs.post_limit
 
 # Clients
 client = OpenAI(api_key=API_KEY)
-ai_mod = AIModerator(client=client)
 
 def etl_posts():
     print("Running posts etl...")
@@ -42,7 +40,7 @@ def etl_posts():
         )
 
         print("Fetching posts...")
-        posts_data = PE.fetch_post_data(moderator = ai_mod)
+        posts_data = PE.fetch_post_data()
         
         loader = DataLoader(
             user=USER, password=PASSWORD, host=HOST, port=PORT, dbname=DBNAME

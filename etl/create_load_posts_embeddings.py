@@ -1,5 +1,5 @@
-from ai_moderator.chatbot import AIModerator
-from ai_moderator.create_embeddings import PostAnalyzer
+from openai_embeddings.embedder import TextEmbedder
+from openai_embeddings.create_embeddings import PostAnalyzer
 from dotenv import load_dotenv
 from openai import OpenAI
 from dataloader.load_data import DataLoader
@@ -18,7 +18,7 @@ POST_LIMIT = PostAPIConfigs.post_limit
 
 # Clients
 client = OpenAI(api_key=API_KEY)
-ai_mod = AIModerator(client=client)
+embedder = TextEmbedder(client=client)
 
 # Instances
 loader = DataLoader(
@@ -38,7 +38,7 @@ def posts_embeddings():
 
         print(f"Found {len(new_posts)} posts to embedd.")
 
-        results = analyzer.process_posts(moderator = ai_mod,posts = new_posts)   
+        results = analyzer.process_posts(embedder = embedder,posts = new_posts)   
         if results:
 
             print(f"{len(results)} have been processed.")

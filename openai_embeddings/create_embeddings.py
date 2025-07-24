@@ -1,6 +1,6 @@
 from dataloader.load_data import DataLoader
 from typing import List, Dict, Any, Tuple, Optional
-from ai_moderator.chatbot import AIModerator
+from .embedder import TextEmbedder
 
 
 class PostAnalyzer:
@@ -40,7 +40,7 @@ class PostAnalyzer:
             return []
 
     def process_posts(
-        self, moderator: AIModerator, posts: List[Dict[str, Any]]
+        self, embedder: TextEmbedder, posts: List[Dict[str, Any]]
     ) -> List[Tuple[str, str, str, str, str, Optional[str], Optional[str], Any]]:
         """
         Performs ai analysis and creates embeddings for a new post and return a row-tuple for upsert.
@@ -51,7 +51,7 @@ class PostAnalyzer:
             try:
                 if not post["selftext"]:
                     continue
-                embeddings = moderator.generate_embeddings(text=post["selftext"])
+                embeddings = embedder.generate_embeddings(text=post["selftext"])
                 res.append(
                     (
                         post["id"],
@@ -64,7 +64,6 @@ class PostAnalyzer:
                     )
                 )
             except Exception as e:
-                # TODO log properly in side-outputs
                 print(f"{self.__class__.__name__} - {self.process_posts.__name__}")
                 print(f"[ERROR] occurred when processing post {post['id']}: {e}")
 
