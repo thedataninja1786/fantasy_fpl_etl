@@ -1,5 +1,5 @@
 import praw
-from typing import List, Dict, Tuple, Any
+from typing import List, Tuple, Any
 from datetime import datetime
 from praw.models import Subreddit
 
@@ -66,6 +66,7 @@ class PostExtractor:
         """
 
         post_data = []
+        post_errors = []
         try:
             subreddit = self._create_subreddit()
         except Exception as e:
@@ -74,15 +75,16 @@ class PostExtractor:
 
         for submission in subreddit.new(limit=self.post_limit):
             try:
-                if not submission.score or submission.score < 4:
-                    continue 
+                if not submission.selftext:
+                    continue
+
                 post_data.append(
                     (
                         submission.id,
                         submission.title,
                         str(submission.author) if submission.author else "unknown",
-                        submission.link_flair_text or "",
-                        submission.selftext or "",
+                        submission.link_flair_text or None,
+                        submission.selftext or None,
                         str(submission.subreddit),
                         submission.score,
                         submission.num_comments or 0,
@@ -94,8 +96,14 @@ class PostExtractor:
                     )
                 )
             except Exception as e:
+                err = submission.id + " - " + str(e)
+                post_errors.append(err)
                 print(
                     f" [ERROR] processing post {getattr(submission, 'id', 'unknown')}: {e}"
                 )
+            
+        with open("post-errors.txt","w") as f:
+            for err in post_errors:
+                f.write(err)
 
         return post_data
