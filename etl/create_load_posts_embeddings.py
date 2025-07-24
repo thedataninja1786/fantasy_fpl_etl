@@ -1,59 +1,40 @@
 from openai_embeddings.embedder import TextEmbedder
 from openai_embeddings.create_embeddings import PostAnalyzer
-from dotenv import load_dotenv
-from openai import OpenAI
 from dataloader.load_data import DataLoader
-from api.configs import SchemaConfigs, PostAPIConfigs
-from utils.utilities import get_env_variable
+from etl import client, USER, PASSWORD, HOST, PORT, DBNAME, POST_LIMIT, SchemaConfigs
 
-load_dotenv()
-# Env vars
-API_KEY = get_env_variable("API_KEY")
-USER    = get_env_variable("DB_USER")
-PASSWORD= get_env_variable("DB_PASSWORD")
-HOST    = get_env_variable("DB_HOST")
-PORT    = get_env_variable("DB_PORT")
-DBNAME  = get_env_variable("DB_NAME")
-POST_LIMIT = PostAPIConfigs.post_limit
 
-# Clients
-client = OpenAI(api_key=API_KEY)
 embedder = TextEmbedder(client=client)
 
 # Instances
-loader = DataLoader(
-    user=USER,
-    password=PASSWORD,
-    host=HOST,
-    port=PORT,
-    dbname=DBNAME
-)
+loader = DataLoader(user=USER, password=PASSWORD, host=HOST, port=PORT, dbname=DBNAME)
 analyzer = PostAnalyzer()
+
 
 def posts_embeddings():
     print("Running creating embeddings for posts...")
     try:
 
-        new_posts = analyzer.find_new_posts(loader = loader, post_limit = POST_LIMIT)    
+        new_posts = analyzer.find_new_posts(loader=loader, post_limit=POST_LIMIT)
 
         print(f"Found {len(new_posts)} posts to embedd.")
 
-        results = analyzer.process_posts(embedder = embedder,posts = new_posts)   
+        results = analyzer.process_posts(embedder=embedder, posts=new_posts)
         if results:
 
             print(f"{len(results)} have been processed.")
             print("Writing data to remote database...")
 
             loader.write_data(
-            table_name="posts_embeddings",
-            data_rows=results,
-            column_names=SchemaConfigs.table_mapping["posts_embeddings"],
-            write_method="upsert",
-            upsert_on=["id"],
+                table_name="posts_embeddings",
+                data_rows=results,
+                column_names=SchemaConfigs.table_mapping["posts_embeddings"],
+                write_method="upsert",
+                upsert_on=["id"],
             )
         else:
             print("No results to write; exiting...")
-        
+
     except Exception as e:
         print(f"{posts_embeddings.__name__} - [ERROR] An error occurred {e}")
 

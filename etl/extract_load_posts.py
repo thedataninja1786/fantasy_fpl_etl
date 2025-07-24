@@ -1,31 +1,20 @@
-from api.configs import PostAPIConfigs, SchemaConfigs
-from utils.utilities import get_env_variable
-from dotenv import load_dotenv
 from extractors.extract_posts import PostExtractor
 from dataloader.load_data import DataLoader
-from openai import OpenAI
+from etl import (
+    USER,
+    PASSWORD,
+    HOST,
+    PORT,
+    DBNAME,
+    POST_LIMIT,
+    SUBREDDIT_NAME,
+    CLIENT_ID,
+    SECRET,
+    TIMEOUT,
+    USER_AGENT,
+    SchemaConfigs,
+)
 
-load_dotenv()
-
-# DB CONFIGS
-USER = get_env_variable("DB_USER")
-PASSWORD = get_env_variable("DB_PASSWORD")
-HOST = get_env_variable("DB_HOST")
-PORT = get_env_variable("DB_PORT")
-DBNAME = get_env_variable("DB_NAME")
-API_KEY = get_env_variable("API_KEY")
-
-# Subreddit Configs
-REDDIT_USERNAME = get_env_variable("REDDIT_USERNAME")
-SUBREDDIT_NAME = PostAPIConfigs.subreddit_name
-CLIENT_ID = get_env_variable("CLIENT_ID")
-SECRET = get_env_variable("CLIENT_SECRET")
-TIMEOUT = PostAPIConfigs.timeout
-USER_AGENT = f"script:{SUBREDDIT_NAME}:1.0 (by u/{REDDIT_USERNAME})"
-POST_LIMIT = PostAPIConfigs.post_limit
-
-# Clients
-client = OpenAI(api_key=API_KEY)
 
 def etl_posts():
     print("Running posts etl...")
@@ -41,7 +30,7 @@ def etl_posts():
 
         print("Fetching posts...")
         posts_data = PE.fetch_post_data()
-        
+
         loader = DataLoader(
             user=USER, password=PASSWORD, host=HOST, port=PORT, dbname=DBNAME
         )
@@ -56,6 +45,7 @@ def etl_posts():
         )
     except Exception as e:
         print(f"{etl_posts.__name__} - [ERROR] An error occurred {e}")
+
 
 if __name__ == "__main__":
     etl_posts()

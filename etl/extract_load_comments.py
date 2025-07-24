@@ -1,32 +1,25 @@
-from dotenv import load_dotenv
-from api.configs import PostAPIConfigs, SchemaConfigs
 from dataloader.load_data import DataLoader
-from utils.utilities import get_env_variable
 from extractors.extract_posts_comments import CommentExtractor
-
-load_dotenv()
-
-# DB CONFIGS
-USER = get_env_variable("DB_USER")
-PASSWORD = get_env_variable("DB_PASSWORD")
-HOST = get_env_variable("DB_HOST")
-PORT = get_env_variable("DB_PORT")
-DBNAME = get_env_variable("DB_NAME")
-
-loader = DataLoader(
-    user=USER, password=PASSWORD, host=HOST, port=PORT, dbname=DBNAME
+from etl import (
+    USER,
+    PASSWORD,
+    HOST,
+    PORT,
+    DBNAME,
+    POST_LIMIT,
+    SUBREDDIT_NAME,
+    CLIENT_ID,
+    SECRET,
+    TIMEOUT,
+    USER_AGENT,
+    SchemaConfigs,
 )
 
-# Reddit configs
-REDDIT_USERNAME = get_env_variable("REDDIT_USERNAME")
-SUBREDDIT_NAME = PostAPIConfigs.subreddit_name
-CLIENT_ID = get_env_variable("CLIENT_ID")
-SECRET = get_env_variable("CLIENT_SECRET")
-TIMEOUT = PostAPIConfigs.timeout
-USER_AGENT = f"script:{SUBREDDIT_NAME}:1.0 (by u/{REDDIT_USERNAME})"
-POST_LIMIT = PostAPIConfigs.post_limit
 
-def etl_comments():    
+loader = DataLoader(user=USER, password=PASSWORD, host=HOST, port=PORT, dbname=DBNAME)
+
+
+def etl_comments():
     print("Running comments etl...")
     try:
         CE = CommentExtractor(
